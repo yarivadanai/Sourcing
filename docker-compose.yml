@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  # PostgreSQL database
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: sourcing_engine
+      POSTGRES_USER: sourcing_user
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sourcing_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Sourcing engine
+  sourcing-engine:
+    build: .
+    environment:
+      - DATABASE_URL=postgresql://sourcing_user:${DB_PASSWORD:-changeme}@db:5432/sourcing_engine
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - PROXYCURL_API_KEY=${PROXYCURL_API_KEY}
+      - HUNTER_IO_API_KEY=${HUNTER_IO_API_KEY}
+      - AIRTABLE_API_KEY=${AIRTABLE_API_KEY}
+      - AIRTABLE_BASE_ID=${AIRTABLE_BASE_ID}
+      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL}
+      - MONTHLY_BUDGET=${MONTHLY_BUDGET:-150.00}
+      - MIN_SCORE_THRESHOLD=${MIN_SCORE_THRESHOLD:-6.0}
+    volumes:
+      - ./output:/app/output
+      - ./logs:/app/logs
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
