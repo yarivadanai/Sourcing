@@ -16,6 +16,12 @@ from pipeline.scoring.readiness import ReadinessAssessment
 from pipeline.sources.base import RawLead
 from pipeline.sources.arxiv_source import ArxivSource
 from pipeline.sources.eu_grants_source import EUGrantsSource
+from pipeline.sources.conference_source import ConferenceSource
+from pipeline.sources.github_source import GitHubSource
+from pipeline.sources.university_spinoffs_source import UniversitySpinoffsSource
+from pipeline.sources.accelerator_source import AcceleratorSource
+from pipeline.enrichment.linkedin import LinkedInEnrichment
+from pipeline.enrichment.email import EmailFinder
 
 # Configure logger
 logger.remove()
@@ -31,6 +37,8 @@ class FounderSourcingPipeline:
         self.cost_tracker = CostTracker()
         self.scoring_engine = ScoringEngine()
         self.readiness_assessment = ReadinessAssessment()
+        self.linkedin_enrichment = LinkedInEnrichment(self.cost_tracker)
+        self.email_finder = EmailFinder(self.cost_tracker)
 
     def run(self):
         """Execute the full weekly sourcing pipeline."""
@@ -50,19 +58,27 @@ class FounderSourcingPipeline:
             leads = self._deduplicate_and_save(raw_leads)
             logger.info(f"After deduplication: {len(leads)} unique leads")
 
-            # Step 3: Score all leads
-            logger.info("\n⭐ STEP 3: Scoring leads...")
+            # Step 3: Score all leads (preliminary)
+            logger.info("\n⭐ STEP 3: Scoring leads (preliminary)...")
             self._score_leads(leads)
 
-            # Step 4: Assess readiness
-            logger.info("\n🎯 STEP 4: Assessing readiness...")
+            # Step 4: Enrich high-scoring leads
+            logger.info("\n💎 STEP 4: Enriching high-scoring leads...")
+            self._enrich_leads(leads)
+
+            # Step 5: Re-score with enrichment data
+            logger.info("\n⭐ STEP 5: Re-scoring with enrichment...")
+            self._score_leads(leads)
+
+            # Step 6: Assess readiness
+            logger.info("\n🎯 STEP 6: Assessing readiness...")
             self._assess_readiness(leads)
 
-            # Step 5: Update metrics
+            # Step 7: Update metrics
             self._update_metrics(leads)
 
-            # Step 6: Generate output
-            logger.info("\n📤 STEP 5: Generating output...")
+            # Step 8: Generate output
+            logger.info("\n📤 STEP 7: Generating output...")
             self._generate_output(leads)
 
             # Complete monitoring
@@ -102,12 +118,49 @@ class FounderSourcingPipeline:
             self.monitor.log_source_result('eu_grant', 0, False)
             self.monitor.log_error(str(e), 'eu_grant')
 
-        # TODO: Add more sources:
-        # - Conference speakers
-        # - GitHub trending
-        # - University spin-offs
-        # - Accelerators
-        # - Hackathons
+        # Source 3: Conference Speakers
+        try:
+            conference_source = ConferenceSource()
+            conference_leads = conference_source.collect()
+            all_leads.extend(conference_leads)
+            self.monitor.log_source_result('conference', len(conference_leads), True)
+        except Exception as e:
+            logger.error(f"Conference source failed: {e}")
+            self.monitor.log_source_result('conference', 0, False)
+            self.monitor.log_error(str(e), 'conference')
+
+        # Source 4: GitHub Trending
+        try:
+            github_source = GitHubSource()
+            github_leads = github_source.collect()
+            all_leads.extend(github_leads)
+            self.monitor.log_source_result('github', len(github_leads), True)
+        except Exception as e:
+            logger.error(f"GitHub source failed: {e}")
+            self.monitor.log_source_result('github', 0, False)
+            self.monitor.log_error(str(e), 'github')
+
+        # Source 5: University Spin-offs
+        try:
+            spinoffs_source = UniversitySpinoffsSource()
+            spinoffs_leads = spinoffs_source.collect()
+            all_leads.extend(spinoffs_leads)
+            self.monitor.log_source_result('spinoff', len(spinoffs_leads), True)
+        except Exception as e:
+            logger.error(f"University spin-offs source failed: {e}")
+            self.monitor.log_source_result('spinoff', 0, False)
+            self.monitor.log_error(str(e), 'spinoff')
+
+        # Source 6: Accelerators
+        try:
+            accelerator_source = AcceleratorSource()
+            accelerator_leads = accelerator_source.collect()
+            all_leads.extend(accelerator_leads)
+            self.monitor.log_source_result('accelerator', len(accelerator_leads), True)
+        except Exception as e:
+            logger.error(f"Accelerator source failed: {e}")
+            self.monitor.log_source_result('accelerator', 0, False)
+            self.monitor.log_error(str(e), 'accelerator')
 
         return all_leads
 
@@ -193,6 +246,32 @@ class FounderSourcingPipeline:
                 logger.debug(f"Scored '{lead.name}': {score:.2f}")
 
             db.commit()
+
+    def _enrich_leads(self, leads: List[Lead]):
+        """Enrich high-scoring leads with LinkedIn and email data."""
+        # Filter for leads worth enriching (score >= 5.0)
+        leads_to_enrich = [l for l in leads if l.preliminary_score >= 5.0]
+
+        logger.info(f"Enriching {len(leads_to_enrich)} leads (score >= 5.0)")
+
+        with get_db() as db:
+            for idx, lead in enumerate(leads_to_enrich, 1):
+                try:
+                    # LinkedIn enrichment
+                    self.linkedin_enrichment.enrich_lead(lead)
+
+                    # Email finding
+                    self.email_finder.find_email(lead)
+
+                    if idx % 10 == 0:
+                        logger.info(f"Enriched {idx}/{len(leads_to_enrich)} leads")
+
+                except Exception as e:
+                    logger.error(f"Failed to enrich '{lead.name}': {e}")
+
+            db.commit()
+
+        logger.info(f"Enrichment complete. LinkedIn URLs: {sum(1 for l in leads if l.linkedin_url)}, Emails: {sum(1 for l in leads if l.email)}")
 
     def _assess_readiness(self, leads: List[Lead]):
         """Assess readiness for all leads."""
