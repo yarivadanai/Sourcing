@@ -1,19 +1,49 @@
 # Ellipsis Venture: AI Deep Tech Founder Sourcing Engine
 
-**Automated weekly pipeline to identify pre-seed AI deep tech founders in Europe before they raise.**
+**Automated pipeline to identify pre-seed AI deep tech founders in Europe before they raise.**
 
 ## 🎯 Overview
 
-This system automatically identifies high-potential AI Deep Tech founders at the earliest stages (pre-seed, stealth, considering founding) across European hubs. It aggregates data from academic publications, GitHub activity, university spin-offs, EU research grants, and more to produce a ranked, segmented list of leads for outreach.
+This system automatically identifies high-potential AI Deep Tech founders at the earliest stages (pre-seed, stealth, considering founding) across European hubs. It aggregates data from 10 comprehensive sources including academic publications, GitHub activity, university spin-offs, EU research grants, conferences, hackathons, patents, Twitter, and technical blogs to produce a ranked, segmented list of leads for outreach.
 
-### Key Features
+### Key Innovation: Multi-Signal Momentum Scoring
 
-- **📊 Multi-Source Data Collection**: ArXiv, GitHub, EU Grants, Conferences
-- **🎯 Advanced Scoring**: Multi-signal momentum detection, negative signal filtering
-- **🔥 Readiness Assessment**: Categorizes leads as HOT/WARM/COLD for prioritized outreach
-- **💰 Cost Tracking**: Smart enrichment strategy stays within budget
-- **📈 Continuous Learning**: Feedback loop improves scoring over time
-- **🗄️ Historical Tracking**: Never re-contact the same person
+The system's core advantage is detecting founders appearing across **multiple signals** within weeks:
+- Published ArXiv paper → Speaking at conference → GitHub trending → **+30 bonus points**
+- Won hackathon → Tweeting about startup → EU grant recipient → **+20 bonus points**
+
+This "momentum detection" identifies founders at their inflection point—precisely when they're considering founding.
+
+## ✨ Key Features
+
+### Data Collection (10 Sources)
+
+- **📚 Academic**: ArXiv papers, Conference speakers (NeurIPS, ICML, ICLR, CVPR, ECCV, EMNLP, ACL, ECAI)
+- **💻 Technical**: GitHub trending repos, Technical blogs (Medium, Substack), Patents (EPO)
+- **🏫 Institutional**: 40 university spin-offs (Switzerland, UK, Sweden, Germany, Netherlands, France, Belgium, Denmark, Norway, Austria)
+- **🚀 Startup Ecosystem**: 22 accelerators (EF, Techstars, Antler, etc.), Hackathon winners (Devpost, MLH)
+- **💰 Funding**: EU Grants (CORDIS), Research funding databases
+- **🐦 Social Signals**: Twitter/X academic monitoring, building in public threads
+
+### Intelligence Layer
+
+- **🎯 Multi-Signal Momentum Detection**: +10/+20/+30 bonus for cross-source appearances
+- **🔥 Readiness Assessment**: HOT (ready to contact) / WARM (nurture) / COLD (monitor)
+- **⚡ Negative Signal Filtering**: Removes Series A+ founders, big tech employees
+- **🎓 Network Effects Scoring**: Bonus for successful lab affiliations
+
+### Enrichment & CRM
+
+- **💼 LinkedIn Enrichment**: Smart Proxycurl integration (only high-scoring leads)
+- **📧 Email Finding**: Hunter.io with verification
+- **📊 Airtable Integration**: Automatic CRM sync with outreach hooks
+- **📈 Analytics & Feedback Loop**: Track performance, optimize scoring
+
+### Cost Management
+
+- **💰 Smart Budget Optimization**: Score >= 7.5 gets full enrichment, 5.0-7.4 gets basic
+- **📉 Cost Tracking**: Real-time monitoring with alerts at 80% budget
+- **🎚️ Configurable Thresholds**: Adjust enrichment strategy based on budget
 
 ## 🚀 Quick Start
 
@@ -23,7 +53,7 @@ pip install -r requirements.txt
 
 # Set up environment
 cp .env.example .env
-# Edit .env with your API keys
+# Edit .env with your API keys (see SETUP.md for details)
 
 # Initialize database
 python -c "from pipeline.database import init_db; init_db()"
@@ -32,15 +62,275 @@ python -c "from pipeline.database import init_db; init_db()"
 python -m pipeline.main
 ```
 
-## 📊 Expected Results (Phase 1)
+**For detailed setup instructions**, see [SETUP.md](SETUP.md).
 
-- **~100-150 leads/month** from ArXiv + EU Grants
-- **~50-75 qualified leads** (score >= 6.0)
-- **~15-25 HOT leads** for immediate outreach
+## 📊 Expected Results
 
-## 📝 Documentation
+### Full Pipeline (All 10 Sources)
 
-- **Comprehensive Plan Review**: `plan_review_and_improvements.md`
-- **Setup Guide**: See Quick Start above
+- **~500-800 raw leads/month**
+- **~200-300 qualified leads** (score >= 5.0)
+- **~50-75 HOT leads** (score >= 7.5, ready for immediate outreach)
+- **~100-150 WARM leads** (score 6.0-7.4, nurture campaigns)
+
+### Lead Quality Indicators
+
+**HOT Leads** (Score >= 7.5):
+- Multiple signals within 30 days
+- Recent activity (paper + code + conference)
+- Clear technical expertise
+- Pre-seed or considering founding
+- European location
+
+**WARM Leads** (Score 6.0-7.4):
+- 2+ signals
+- Strong technical background
+- Potentially exploring founding
+- Worth nurturing
+
+**COLD Leads** (Score 5.0-5.9):
+- Single strong signal
+- Monitor for momentum
+- Low-touch campaigns
+
+## 🗺️ Geographic Coverage
+
+### 40 European Universities
+
+- **Switzerland (4)**: ETH Zurich, EPFL, University of Zurich, University of Basel
+- **UK (8)**: Oxford, Cambridge, Imperial, UCL, Edinburgh, King's College, Manchester, Warwick
+- **Sweden (4)**: KTH, Chalmers, Lund, Uppsala
+- **Germany (7)**: TUM, LMU Munich, RWTH Aachen, Heidelberg, HU Berlin, Karlsruhe, Stuttgart
+- **Netherlands (4)**: TU Delft, University of Amsterdam, TU Eindhoven, Utrecht
+- **France (4)**: École Polytechnique, Sorbonne, PSL, Grenoble INP
+- **Belgium (1)**: KU Leuven
+- **Denmark (1)**: DTU
+- **Norway (1)**: NTNU
+- **Austria (1)**: TU Wien
+
+### 22 European Accelerators
+
+Entrepreneurs First, Techstars, Antler, Startup Wise Guys, Seedcamp, HEARTFELT_, Rockstart, NDRC, Plug and Play, imec.istart, Founders Factory, Startupbootcamp, Bethnal Green Ventures, Wayra, Birdhouse, Accelerace, Sting, Tenity, Demium, LVenture Group, HighTechXL, Norrsken Evolve
+
+## 💰 Cost Structure
+
+### Budget-Friendly Tiers
+
+**Free Tier** (8/10 sources, $0/month):
+- ArXiv, EU Grants, GitHub, Conferences, Universities, Accelerators, Hackathons, Blogs
+- **~300-400 leads/month**, no enrichment
+- Great for testing and validation
+
+**Starter** ($150/month):
+- All free sources + LinkedIn (basic) + Email finding
+- **~200 qualified + enriched leads/month**
+- 50 HOT leads with emails
+
+**Professional** ($300/month):
+- All sources + full LinkedIn + Email + Twitter monitoring
+- **~250 qualified + enriched leads/month**
+- 75 HOT leads with full profiles
+
+### API Cost Breakdown
+
+| Service | Monthly Cost | Usage | Purpose |
+|---------|-------------|-------|---------|
+| Twitter API | $100 | 10K tweets | Academic monitoring |
+| Proxycurl (LinkedIn) | $100-150 | 3K-5K profiles | Profile enrichment |
+| Hunter.io (Email) | $50-100 | 1K-2K emails | Email finding |
+| **Total** | **$250-350** | | |
+
+**Smart enrichment strategy** ensures you only pay for high-quality leads (score >= 5.0).
+
+## 📂 Output Files
+
+```
+output/
+├── hot_leads.csv          # Score >= 7.5 (ready to contact NOW)
+├── warm_leads.csv         # Score 6.0-7.4 (nurture campaigns)
+├── cold_leads.csv         # Score 5.0-5.9 (monitor for signals)
+├── all_leads.csv          # All qualified leads
+└── pipeline_report.json   # Execution summary and analytics
+```
+
+### CSV Format
+
+Each lead includes:
+- **Contact**: Name, email, LinkedIn URL
+- **Context**: University, company, current role
+- **Scoring**: Total score, momentum score, readiness (HOT/WARM/COLD)
+- **Attribution**: Sources found, timestamps, recency
+- **Outreach**: AI-generated outreach hook based on latest activity
+
+### Airtable Integration
+
+Automatic CRM sync with:
+- Deduplication by email/LinkedIn/name
+- Status tracking (New → Contacted → Responded → Meeting → Passed)
+- Outreach history
+- Score and readiness fields
+- Source attribution
+
+## 🏗️ Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Data Collection Layer                     │
+├──────────┬──────────┬──────────┬──────────┬─────────────────┤
+│  ArXiv   │  GitHub  │ EU Grants│Conferences│  Universities   │
+│  Papers  │ Trending │  CORDIS  │ Speakers  │   Spin-offs     │
+├──────────┼──────────┼──────────┼──────────┼─────────────────┤
+│Accelerators│Hackathons│ Patents │ Twitter  │  Tech Blogs     │
+│  22 Accs │Devpost/MLH│   EPO   │ Academic │ Medium/Substack │
+└──────────┴──────────┴──────────┴──────────┴─────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────────┐
+│              Deduplication & Enrichment Layer                │
+│  • Fuzzy name matching (85% threshold)                       │
+│  • Smart LinkedIn enrichment (score >= 5.0)                  │
+│  • Email finding (score >= 7.5)                              │
+└─────────────────────────────────────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────────┐
+│                  Scoring & Assessment Layer                  │
+│  • Multi-signal momentum (+10/+20/+30)                       │
+│  • Negative signal filtering (big tech, late stage)          │
+│  • Network effects (successful lab bonus)                    │
+│  • Readiness assessment (HOT/WARM/COLD)                      │
+└─────────────────────────────────────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────────┐
+│                    Output & CRM Layer                        │
+│  • Segmented CSV files (hot/warm/cold)                       │
+│  • Airtable CRM sync                                         │
+│  • Outreach hooks generation                                 │
+│  • Analytics and reporting                                   │
+└─────────────────────────────────────────────────────────────┘
+```
+
+## 🔧 Tech Stack
+
+- **Language**: Python 3.11+
+- **Database**: PostgreSQL 14+ (historical tracking, deduplication)
+- **Data Models**: Pydantic for validation, SQLAlchemy ORM
+- **Web Scraping**: BeautifulSoup4, requests
+- **APIs**: ArXiv, GitHub, CORDIS, Proxycurl, Hunter.io, Twitter, Airtable
+- **Monitoring**: Loguru logging, Slack webhooks
+- **Deployment**: Docker, systemd timers, cron
+
+## 📈 Analytics & Optimization
+
+### Built-in Analytics
+
+```bash
+# Generate 30-day performance report
+python -m pipeline.analytics report --days 30
+
+# Source performance breakdown
+python -m pipeline.analytics sources
+
+# Scoring effectiveness analysis
+python -m pipeline.analytics scoring
+
+# Current spend tracking
+python -m pipeline.analytics current-spend
+```
+
+### Feedback Loop
+
+Track outreach performance to improve scoring:
+
+```bash
+# Record outreach attempt
+python -m pipeline.analytics record-outreach \
+  --lead-id 123 --method email
+
+# Record response
+python -m pipeline.analytics record-response \
+  --lead-id 123 --responded true --meeting-scheduled true
+
+# Generate insights
+python -m pipeline.analytics insights
+```
+
+The system automatically adjusts scoring weights based on what leads to successful meetings.
+
+## 🔒 Security & Privacy
+
+- All API keys in environment variables (never committed)
+- PostgreSQL with user-level permissions
+- GDPR-compliant data handling (EU-focused)
+- Opt-out mechanism for leads
+- Secure credential storage
+- Regular dependency updates
+
+## 📚 Documentation
+
+- **[SETUP.md](SETUP.md)**: Complete setup and deployment guide
+- **[plan_review_and_improvements.md](plan_review_and_improvements.md)**: Original plan and enhancement recommendations
+- **[pipeline/](pipeline/)**: Source code with inline documentation
+
+## 🛠️ Development
+
+### Project Structure
+
+```
+sourcing-engine/
+├── config/
+│   └── settings.py          # Pydantic configuration
+├── pipeline/
+│   ├── sources/             # 10 data sources
+│   │   ├── arxiv_source.py
+│   │   ├── github_source.py
+│   │   ├── eu_grants_source.py
+│   │   ├── conference_source.py
+│   │   ├── university_spinoffs_source.py
+│   │   ├── accelerator_source.py
+│   │   ├── hackathon_source.py
+│   │   ├── patent_source.py
+│   │   ├── twitter_source.py
+│   │   └── blog_source.py
+│   ├── enrichment/          # LinkedIn + Email
+│   │   ├── linkedin.py
+│   │   └── email.py
+│   ├── scoring/             # Scoring engine
+│   │   ├── engine.py
+│   │   └── readiness.py
+│   ├── output/              # Export modules
+│   │   └── airtable_exporter.py
+│   ├── models.py            # Database models
+│   ├── database.py          # DB connection
+│   ├── monitoring.py        # Alerts & monitoring
+│   ├── cost_tracker.py      # Budget tracking
+│   ├── analytics.py         # Analytics & feedback
+│   └── main.py              # Pipeline orchestration
+├── SETUP.md                 # Setup guide
+└── README.md                # This file
+```
+
+### Running Tests
+
+```bash
+# Run all tests
+pytest
+
+# Run with coverage
+pytest --cov=pipeline
+
+# Run specific test
+pytest tests/test_scoring.py
+```
+
+## 🤝 Contributing
+
+This is a private project for Ellipsis Venture. For questions or issues, contact the development team.
+
+## 📄 License
+
+Proprietary - Ellipsis Venture
+
+---
 
 **Built with ❤️ for Ellipsis Venture**
+
+*Identifying Europe's next generation of AI deep tech founders, before they raise.*

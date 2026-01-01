@@ -20,8 +20,13 @@ from pipeline.sources.conference_source import ConferenceSource
 from pipeline.sources.github_source import GitHubSource
 from pipeline.sources.university_spinoffs_source import UniversitySpinoffsSource
 from pipeline.sources.accelerator_source import AcceleratorSource
+from pipeline.sources.hackathon_source import HackathonSource
+from pipeline.sources.patent_source import PatentSource
+from pipeline.sources.twitter_source import TwitterSource
+from pipeline.sources.blog_source import BlogSource
 from pipeline.enrichment.linkedin import LinkedInEnrichment
 from pipeline.enrichment.email import EmailFinder
+from pipeline.exporters.airtable_exporter import AirtableExporter
 
 # Configure logger
 logger.remove()
@@ -39,6 +44,16 @@ class FounderSourcingPipeline:
         self.readiness_assessment = ReadinessAssessment()
         self.linkedin_enrichment = LinkedInEnrichment(self.cost_tracker)
         self.email_finder = EmailFinder(self.cost_tracker)
+
+        # Airtable exporter (optional)
+        try:
+            if settings.airtable_enabled:
+                self.airtable_exporter = AirtableExporter()
+            else:
+                self.airtable_exporter = None
+        except Exception as e:
+            logger.warning(f"Airtable exporter not available: {e}")
+            self.airtable_exporter = None
 
     def run(self):
         """Execute the full weekly sourcing pipeline."""
@@ -80,6 +95,16 @@ class FounderSourcingPipeline:
             # Step 8: Generate output
             logger.info("\n📤 STEP 7: Generating output...")
             self._generate_output(leads)
+
+            # Step 9: Export to Airtable (if configured)
+            if self.airtable_exporter:
+                logger.info("\n📊 STEP 8: Exporting to Airtable...")
+                try:
+                    qualified_leads = [l for l in leads if l.total_score >= settings.min_score_threshold]
+                    exported_count = self.airtable_exporter.export_leads(qualified_leads)
+                    logger.info(f"Exported {exported_count} leads to Airtable")
+                except Exception as e:
+                    logger.error(f"Airtable export failed: {e}")
 
             # Complete monitoring
             self.monitor.complete('completed')
@@ -161,6 +186,50 @@ class FounderSourcingPipeline:
             logger.error(f"Accelerator source failed: {e}")
             self.monitor.log_source_result('accelerator', 0, False)
             self.monitor.log_error(str(e), 'accelerator')
+
+        # Source 7: Hackathon Winners
+        try:
+            hackathon_source = HackathonSource()
+            hackathon_leads = hackathon_source.collect()
+            all_leads.extend(hackathon_leads)
+            self.monitor.log_source_result('hackathon', len(hackathon_leads), True)
+        except Exception as e:
+            logger.error(f"Hackathon source failed: {e}")
+            self.monitor.log_source_result('hackathon', 0, False)
+            self.monitor.log_error(str(e), 'hackathon')
+
+        # Source 8: Patents (optional - requires EPO API)
+        try:
+            patent_source = PatentSource()
+            patent_leads = patent_source.collect()
+            all_leads.extend(patent_leads)
+            self.monitor.log_source_result('patent', len(patent_leads), True)
+        except Exception as e:
+            logger.error(f"Patent source failed: {e}")
+            self.monitor.log_source_result('patent', 0, False)
+            self.monitor.log_error(str(e), 'patent')
+
+        # Source 9: Twitter/X (optional - requires Twitter API)
+        try:
+            twitter_source = TwitterSource()
+            twitter_leads = twitter_source.collect()
+            all_leads.extend(twitter_leads)
+            self.monitor.log_source_result('twitter', len(twitter_leads), True)
+        except Exception as e:
+            logger.error(f"Twitter source failed: {e}")
+            self.monitor.log_source_result('twitter', 0, False)
+            self.monitor.log_error(str(e), 'twitter')
+
+        # Source 10: Technical Blogs
+        try:
+            blog_source = BlogSource()
+            blog_leads = blog_source.collect()
+            all_leads.extend(blog_leads)
+            self.monitor.log_source_result('blog', len(blog_leads), True)
+        except Exception as e:
+            logger.error(f"Blog source failed: {e}")
+            self.monitor.log_source_result('blog', 0, False)
+            self.monitor.log_error(str(e), 'blog')
 
         return all_leads
 
