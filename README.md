@@ -64,6 +64,80 @@ python -m pipeline.main
 
 **For detailed setup instructions**, see [SETUP.md](SETUP.md).
 
+## 🛠️ Utility Tools
+
+### Pipeline Validation
+
+Validate the pipeline end-to-end and check lead quality:
+
+```bash
+python scripts/validate_pipeline.py
+```
+
+This will:
+- Run the pipeline with recent data
+- Validate lead quality against Ellipsis Venture criteria
+- Check European focus, AI/Deep Tech relevance, data completeness
+- Generate a quality report with sample leads
+
+### Historical Data Backfill
+
+Pre-fill the database with historical data from Q4 2025:
+
+```bash
+# Dry run (see what would be collected)
+python scripts/backfill_historical.py --quarter Q4_2025 --dry-run
+
+# Execute backfill
+python scripts/backfill_historical.py --quarter Q4_2025
+```
+
+This collects data from October-December 2025 in weekly chunks to build a rich historical dataset.
+
+### Personalized Outreach Messages
+
+Generate customized outreach messages for leads:
+
+```bash
+# Generate for a single lead
+python scripts/generate_outreach.py --lead-id 123 --sender-name "Your Name"
+python scripts/generate_outreach.py --email john@example.com
+python scripts/generate_outreach.py --lead-name "John Doe"
+
+# LinkedIn connection message (300 char limit)
+python scripts/generate_outreach.py --lead-id 123 --linkedin
+
+# Use specific template
+python scripts/generate_outreach.py --lead-id 123 --template arxiv_paper
+
+# Copy to clipboard
+python scripts/generate_outreach.py --lead-id 123 --copy
+
+# Batch generate for CSV
+python scripts/generate_outreach.py --batch output/hot_leads.csv --sender-name "Your Name"
+
+# List available templates
+python scripts/generate_outreach.py --list-templates
+```
+
+**Available Templates:**
+- `arxiv_paper` - For researchers with recent papers
+- `conference_speaker` - For conference presenters
+- `github_project` - For GitHub projects
+- `hackathon_winner` - For hackathon winners
+- `eu_grant` - For ERC/EU grant recipients
+- `university_spinoff` - For university researchers
+- `accelerator` - For accelerator participants
+- `twitter_building` - For "building in public" founders
+- `multi_signal` - For leads with 3+ signals (momentum)
+- `generic` - Fallback template
+
+Messages are automatically personalized with:
+- Lead's latest activity (paper, project, talk, etc.)
+- Specific technical details from their work
+- Context-aware hooks based on readiness (HOT/WARM/COLD)
+- European/AI focus alignment
+
 ## 📊 Expected Results
 
 ### Full Pipeline (All 10 Sources)
